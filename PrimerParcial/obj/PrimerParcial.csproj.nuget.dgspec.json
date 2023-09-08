@@ -45,6 +45,18 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[7.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[7.0.10, )"
+            },
+            "Radzen.Blazor": {
+              "target": "Package",
+              "version": "[4.15.11, )"
+            },
+            "TicketManagement.BusinessLogic": {
+              "target": "Package",
+              "version": "[1.0.15, )"
             }
           },
           "imports": [
