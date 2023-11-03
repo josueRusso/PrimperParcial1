@@ -11,7 +11,7 @@ using PrimerParcial.DAL;
 namespace PrimerParcial.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20230908164607_Inicio")]
+    [Migration("20231103131520_Inicio")]
     partial class Inicio
     {
         /// <inheritdoc />
@@ -33,9 +33,8 @@ namespace PrimerParcial.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Monto")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<double>("Monto")
+                        .HasColumnType("REAL");
 
                     b.HasKey("IngresoId");
 

@@ -13,7 +13,8 @@ namespace PrimerParcial.Model
         [Required(ErrorMessage = " Debe Contener un Concepto")]
         public String? Concepto { get; set; }
 
-        [Required(ErrorMessage = " Debe Contener un Monto")]
-        public String? Monto { get; set; }
+        [Required(ErrorMessage = "* El campo Precio es Monto")]
+        [Range(0.01, 1000, ErrorMessage = "* El campo Monto debe estar entre 0.01 y 1000")]
+        public double Monto { get; set; }
     }
 }

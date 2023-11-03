@@ -19,7 +19,7 @@ namespace PrimerParcial.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Fecha = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Concepto = table.Column<string>(type: "TEXT", nullable: false),
-                    Monto = table.Column<string>(type: "TEXT", nullable: false)
+                    Monto = table.Column<double>(type: "REAL", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -1,0 +1,170 @@
+﻿@page "/RegistroIngresos"
+@inject NotificationService notificationService
+@inject IngresosBLL IngresosBLL
+
+<EditForm Model="Ingresos" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h3>Registro de Ingresos</h3>
+            </div>
+            <div class="card-body">
+
+                @*IngresosId*@
+                <div class="mb-3">
+                    <InputNumber class="col col-4" @bind-Value="Ingresos.IngresoId" />
+                    <ValidationMessage For="@(() => Ingresos.IngresoId)" />
+                    <button type="button" class="btn btn-sm btn-primary" @onclick="Buscar"> <i class="oi oi-magnifying-glass" /> </button>
+                </div>
+
+                <div Class="form-group mt-3">
+                    <label class="row-text"> Fecha </label>
+                    <div class="input-group">
+                        <input type="date" @bind-value="Ingresos.Fecha" />
+                        <ValidationMessage For="@(() => Ingresos.Fecha)" />
+                    </div>
+                </div>
+
+                @*Concepto*@
+                <div class=" mb-3">
+                    <label class="form-group"> Concepto </label>
+                    <div class="input-group">
+                        <InputTextArea class="form-control" @bind-Value="Ingresos.Concepto" placeholder="Coloque un Concepto" />
+                        <ValidationMessage For="@(() =>Ingresos.Concepto)" />
+                    </div>
+                </div>
+
+                @*Monto*@
+                <div class="mb-3">
+                    <label class="form-label" for="Precio"><i class="oi oi-dollar" /> Precio:</label>
+
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <div class="row-cols-xl-2">
+                            <InputNumber @bind-Value="Ingresos.Monto" class="form-control " placeholder="Coloque el un precio" step="0.01" />
+                        </div>
+                    </div>
+                    <ValidationMessage For="@(() => Ingresos.Monto)" />
+                </div>
+            </div>
+
+            <div class="card-footer d-flex justify-content-center">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary" @onclick="Nuevo"> <i class="oi oi-file" /> Nuevo</button>
+                    <button type="submit" class="btn btn-success" @onclick="Guardar"> <i class="oi oi-document" /> Guardar</button>
+                    <button type="button" class="btn btn-danger" @onclick="Eliminar"><i class="oi oi-trash" /> Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public Ingresos Ingresos { get; set; } = new Ingresos();
+    public int IngresoId { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        if (IngresoId > 0)
+        {
+            Ingresos = IngresosBLL.Buscar(IngresoId) ?? new Ingresos();
+        }
+        else
+        {
+            Nuevo();
+        }
+    }
+
+    public void Buscar()
+    {
+        var buscar = IngresosBLL.Buscar(Ingresos.IngresoId);
+        if (buscar != null)
+        {
+            Ingresos = buscar;
+
+        }
+        else
+        {
+            notificationService.ShowNotification(
+            titulo: "error de busqueda",
+            mensaje: "Registro no encontrado",
+            NotificationSeverity.Error);
+        }
+    }
+
+    public void Nuevo()
+    {
+        this.Ingresos = new Ingresos();
+        this.Ingresos.Fecha = DateTime.Now;
+    }
+
+    public void Guardar()
+    {
+        if (Validar())
+        {
+           
+            var guardar = IngresosBLL.Guardar(this.Ingresos);
+            if (guardar)
+            {
+                notificationService.ShowNotification(
+                    titulo: "Exito",
+                    mensaje: "Guardado correctamente",
+                    NotificationSeverity.Success);
+                Nuevo();
+            }
+            else
+            {
+                notificationService.ShowNotification(
+                    titulo: "Error",
+                    mensaje: "Ocurrio un error y no fue posible guardar",
+                    NotificationSeverity.Error);
+            }
+        }
+    }
+
+
+    public void Eliminar()
+    {
+        Buscar();
+        if (IngresosBLL.Eliminar(this.Ingresos))
+        {
+            notificationService.ShowNotification(
+            titulo: "Exito",
+            mensaje: "Eliminado con Exito",
+            NotificationSeverity.Success);
+            Nuevo();
+        }
+        else
+        {
+            notificationService.ShowNotification(
+            titulo: "Error",
+            mensaje: "Ocurrio un error y no fue posible eliminar",
+            NotificationSeverity.Error);
+        }
+    }
+
+   
+
+    public bool Validar()
+    {
+        if (string.IsNullOrEmpty(Ingresos.Concepto))
+        {
+            return false;
+        }
+        if (Ingresos.Monto < 0)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+}

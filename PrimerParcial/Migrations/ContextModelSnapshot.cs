@@ -30,9 +30,8 @@ namespace PrimerParcial.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Monto")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<double>("Monto")
+                        .HasColumnType("REAL");
 
                     b.HasKey("IngresoId");
 
