@@ -1,0 +1,156 @@
+﻿@page "/ConsultaIngresos"
+@inject IngresosBLL IngresosBLL
+
+<PageTitle>Consulta</PageTitle>
+
+<EditForm Model="Ingresos">
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Consulta de Ingresos</h3>
+        </div>
+
+        <div class="card-body">
+            <form>
+                <div class="input-group d-flex align-items-end">
+                    <InputSelect class="form-control col-2" @bind-Value="filtro">
+                        <option value="">Seleccionar opción</option>
+                        <option value="1">IngresoId</option>
+                        <option value="2">Monto</option>
+                    </InputSelect>
+                    <div class="flex-fill mx-2">
+                        <div class="input-group">
+                            <label class="input-group-text">Búsqueda</label>
+                            <InputText class="form-control" @bind-Value="Criterio" />
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-group-text">Desde</label>
+                        <InputDate @bind-Value="FechaDesde" class="form-control form-control-sm" />
+                    </div>
+                    <div class="input-group">
+                        <label class="input-group-text">Hasta</label>
+                        <InputDate @bind-Value="FechaHasta" class="form-control form-control-sm" />
+                    </div>
+
+                    <button type="button" class="btn btn-sm btn-primary" @onclick="Buscar">
+                        <span class="oi oi-magnifying-glass"></span> Buscar
+                    </button>
+
+                    <button type="button" class="btn btn-sm btn-secondary" @onclick="Reiniciar">
+                        <span class="oi oi-arrow-circle-left"></span> Reiniciar
+                    </button>
+
+                    <button type="button" class="btn btn-sm btn-success" @onclick="MostrarTodasConsultas">
+                        <span class="oi oi-list"></span> Mostrar Todas
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <table class="table table-bordered align-items-center">
+            <thead class="thead">
+                <tr class="table">
+                    <th>IngresoId</th>
+                    <th>Fecha</th>
+                    <th>Concepto</th>
+                    <th>Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Ingresos)
+                {
+                    <tr>
+                        <td>@item.IngresoId</td>
+                        <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                        <td>@item.Concepto</td>
+                        <td>@item.Monto</td>
+                        <td><a class="btn btn-outline-primary" href="RegistrosIngresos/@item.IngresoId">Ver</a></td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="card-footer">
+            <div class="form-row justify-content-sm-between" aria-orientation="vertical">
+                <div class="col-3">
+                    <label for="CantidaRegistro" class="col-form-label"><strong>Filas</strong>&nbsp;</label>
+                    <input id="CantidaRegistro" @bind-value="@Conteo" disabled class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    public string filtro { get; set; } = ""; 
+    public string Criterio { get; set; }
+    public int Conteo { get; set; } = 0;
+    public List<Ingresos> Ingresos { get; set; } = new List<Ingresos>();
+
+    public DateTime FechaDesde { get; set; }
+    public DateTime FechaHasta { get; set; }
+
+    protected override void OnInitialized()
+    {
+        FechaDesde = DateTime.Today;
+        FechaHasta = DateTime.Today;
+    }
+
+    private void Buscar()
+    {
+        if (string.IsNullOrEmpty(filtro))
+        {
+            
+        }
+        else if (filtro == "1" && !string.IsNullOrEmpty(Criterio))
+        {
+            if (int.TryParse(Criterio, out int ingresoId))
+            {
+                Ingresos = IngresosBLL.GetList(e => e.IngresoId == ingresoId);
+            }
+            else
+            {
+                Ingresos = new List<Ingresos>();
+            }
+        }
+        else if (filtro == "2" && !string.IsNullOrEmpty(Criterio))
+        {
+            if (double.TryParse(Criterio, out double monto))
+            {
+                Ingresos = IngresosBLL.GetList(e => e.Monto == monto);
+            }
+            else
+            {
+                Ingresos = new List<Ingresos>();
+            }
+        }
+        else
+        {
+            Ingresos = IngresosBLL.GetList(e =>
+                (e.Fecha >= FechaDesde) &&
+                (e.Fecha <= FechaHasta));
+        }
+        Conteo = Ingresos.Count();
+    }
+
+
+    private void Reiniciar()
+    {
+        filtro = "1";
+        Criterio = "";
+        FechaDesde = DateTime.Today;
+        FechaHasta = DateTime.Today;
+        Ingresos = new List<Ingresos>();
+        Conteo = 0;
+    }
+
+    private void MostrarTodasConsultas()
+    {
+        Ingresos = IngresosBLL.GetList(e => true); 
+        Conteo = Ingresos.Count();
+        filtro = "";
+        Criterio = "";
+    }
+}
